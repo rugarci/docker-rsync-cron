@@ -37,15 +37,25 @@ sudo -u "${RSYNC_USER}" -g "${RSYNC_GROUP}" \
 if [[ \$? -eq 0 ]]; then
 echo "Rsync successful at \$(date)"
 else
-echo "Rsync error at \$(date). Sending Email..."
-cat /rsync.log | mail -s "Rsync error detected on host: ${HOSTNAME}" "${MAIL_TO}"
-echo "Email sent"
+echo "Rsync error at \$(date). Sending notification..."
+
+if [[ ! -z ${APPRISE_NOTIFICATION_URLS} ]];then
+    cat /rsync.log | apprise $APPRISE_NOTIFICATION_URLS
+else
+    cat /rsync.log | mail -s "Rsync error detected on host: ${HOSTNAME}" "${MAIL_TO}"
+fi
+
+echo "Notification sent"
 fi
 
 EOF
 chmod +x /run-rsync.sh
 
-df -h | grep rsync | mail -s "Rsync error (EmailTest) detected on host: ${HOSTNAME}" "${MAIL_TO}"
+if [[ ! -z ${APPRISE_NOTIFICATION_URLS} ]];then
+    df -h | grep rsync | apprise $APPRISE_NOTIFICATION_URLS
+else
+    df -h | grep rsync | mail -s "Rsync error (EmailTest) detected on host: ${HOSTNAME}" "${MAIL_TO}"
+fi
 
 # Setup our crontab entry
 export CRONTAB_ENTRY="${RSYNC_CRONTAB} sh /run-rsync.sh"

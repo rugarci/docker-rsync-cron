@@ -12,7 +12,7 @@ copy the contents of the `rsync_src` volume to the `rsync_dst` volume. The
 specific options are configurable via environment variables.
 
 Checkout the [example docker-compose.yml](example/docker-compose.yml) for an
-exmaple of setting up the container with named NFS volumes using `Netshare`.
+example of setting up the container with named NFS volumes using `Netshare`.
 
 ## Using the image
 
@@ -27,7 +27,10 @@ command settings:
 * `RSYNC_SRC`: Source folder or url, defaults to /rsync_src
 * `RSYNC_DST`: Destination folder or url, defaults to /rsync_dst
 
-Additional environment variables for sending mails:
+Additional environment variables for Apprise notifications (https://github.com/caronc/apprise):
+* `APPRISE_NOTIFICATION_URLS`: mailto://userid:pass@domain.com,tgram://bottoken/ChatID
+
+Additional environment variables for sending mails (if previous var is not defined):
 
 * `MAIL_TO`: yyyyyyy@gmail.com
 * `SMTP_ROOT`: xxxxxx@gmail.com
@@ -65,12 +68,7 @@ For Docker compose
       - RSYNC_UID=0
       - RSYNC_GID=0
       - RSYNC_OPTIONS=--archive --timeout=3600 --delete --stats -h
-      - MAIL_TO=yyyyyyy@gmail.com
-      - SMTP_ROOT=xxxxxx@gmail.com
-      - SMTP_HOSTNAME=rsync-cron
-      - SMTP_MAIL_HUB=smtp.gmail.com:587
-      - SMTP_AUTH_USER=xxxxxxx@gmail.com 
-      - SMTP_AUTH_PASS=xxxxxxxx 
+      - APPRISE_CONNECTION_URLS=mailto://192.168.8.128:1025?user=userid
 ```
 
 You can also rsync a remote host with
